@@ -1,11 +1,13 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import cors from 'cors'
 import MovieController from './movies/movies-controller.js';
 import UserController from './users/users-controller.js';
 dotenv.config();
 
 const app = express();
+app.use(cors())
 app.use(express.json());
 
 MovieController(app);
