@@ -18,9 +18,9 @@ const FollowsController = (app) => {
         res.json(followed)
     }
 
-    app.post('/follows', followUser)
-    app.get('/users/:followed/followers', findFollowers)
-    app.get('/users/:follower/following', findFollowing)
+    app.post('/api/follows', followUser)
+    app.get('/api/users/:followed/followers', findFollowers)
+    app.get('/api/users/:follower/following', findFollowing)
 }
 
 export default FollowsController
