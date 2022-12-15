@@ -1,4 +1,4 @@
-import followsModel from "./follows-model.js";
+import followsModel from "../models/Follow.js";
 
 export const followUser = (follow) =>
     followsModel.create(follow)
