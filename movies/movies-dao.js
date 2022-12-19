@@ -21,6 +21,29 @@ export const deleteMovie = (id) => {
     const status = movieModel.deleteOne( {_id: id} );
     return status;
 }
+
+// Get by ID
+export const findMoiveById = (id) => {
+    const movie = movieModel.findById(id);
+    return movie;
+}
+
+// Get all
+export const findMovieAll = (type) => {
+    let movies = [];
+    if (type === "series") {
+        movies = movieModel.aggregate([
+            { $match: { isSeries: true } },
+            { $sample: {size: 10} },
+        ]);
+    } else {
+        movies = movieModel.aggregate([
+            { $match: { isSeries: false } },
+            { $sample: {size: 10} },
+        ]);
+    } 
+    return movies;
+}
 // Get random movie
 export const findMovieRandom = (type) => {
     let movie;
@@ -36,16 +59,4 @@ export const findMovieRandom = (type) => {
         ]);
     } 
     return movie;
-}
-
-// Get by ID
-export const findMoiveById = (id) => {
-    const movie = movieModel.findById(id);
-    return movie;
-}
-
-// Get all
-export const findMovieAll = () => {
-    const movies = movieModel.find();
-    return movies;
 }

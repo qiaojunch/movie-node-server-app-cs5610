@@ -19,8 +19,9 @@ const MovieController = (app) => {
     };
 
     const findMovieAll = async (req, res) => {
-        const movies = await dao.findMovieAll();
-        res.json(movies.reverse());
+        const type = req.query.type;
+        const movies = await dao.findMovieAll(type);
+        res.json(movies);
     }
 
     const findMoiveById = async (req, res) => {
@@ -42,7 +43,6 @@ const MovieController = (app) => {
     app.get("/api/movie/find", findMovieAll);
     app.get("/api/movie/find/:mid", findMoiveById);
     app.get("/api/movie/random", findMoiveRandom);
-
 }
 
 export default MovieController;

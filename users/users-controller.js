@@ -1,7 +1,8 @@
 import * as dao from "./users-dao.js";
 
+let currentUser = null;
+
 const UserController = (app) => {
-    let currUser;
 
     const createUser = async (req, res) => {
         const user = req.body;
@@ -18,8 +19,9 @@ const UserController = (app) => {
     const updateUser = async (req, res) => {
         const uid = req.params.uid;
         const updates = req.body;
-        const status = await dao.updateUser(uid, updates);
-        res.json(status);
+        const updatedUser = await dao.updateUser(uid, updates);
+        req.session['currentUser'] = updatedUser;
+        res.json(updatedUser);
     };
 
     const findAllUsers = async (req, res) => {
@@ -30,48 +32,52 @@ const UserController = (app) => {
     const findUserById = async (req, res) => {
         const uid = req.params.uid;
         const foundUser = await dao.findUserById(uid);
-        res.json(foundUser);
+        if (foundUser) {
+            res.json(foundUser);
+            return;
+        }
+        res.sendStatus(404);
+        
     }
 
     const register = async (req, res) => {
         const user = req.body;
-        console.log("user name", user.username);
         const foundUser = await dao.findByUserName(user.username);
 
         if (foundUser) {
-            res.json(403);
+            res.sendStatus(403);
             return;
         }
         // create user
-        const actualUser = await dao.createUser(user);
-        currUser = actualUser;
-        res.json(actualUser);
+        const currUser = await dao.createUser(user);
+        req.session['currentUser'] = currUser;
+        res.json(currUser);
     };
 
     const login = async (req, res) => {
-        const user = req.body;
+        const credentials = req.body;
         
-        const foundUser = await dao.findUserByCredentials(user.username, user.password);
+        const foundUser = await dao.findUserByCredentials(credentials.username, credentials.password);
         if (!foundUser) {
-            res.json(403);
+            res.sendStatus(403);
             return;
         }
-        currUser = foundUser;
+        req.session['currentUser'] = foundUser;
         res.json(foundUser);
     };
 
     // Retrieve current user
     const profile = async (req, res) => {
-        if (currUser) {
-            res.json(currUser);
+        if (req.session['currentUser']) {
+            res.json(req.session['currentUser']);
             return;
         }
-        res.send(403);
+        res.sendStatus(403);
     }
 
     const logout = async (req, res) => {
-        currUser = null;
-        res.send(200);
+        req.session.destroy();
+        res.sendStatus(200);
     };
 
     app.post("/api/user", createUser);
